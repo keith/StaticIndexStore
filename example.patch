@@ -1,0 +1,63 @@
+diff --git a/clang/tools/IndexStore/CMakeLists.txt b/clang/tools/IndexStore/CMakeLists.txt
+index bf5719e13e20..86d2fb7228af 100644
+--- a/clang/tools/IndexStore/CMakeLists.txt
++++ b/clang/tools/IndexStore/CMakeLists.txt
+@@ -71,6 +71,14 @@ endif()
+ 
+ set(INDEXSTORE_HEADERS_INSTALL_DESTINATION "local/include")
+ 
++target_compile_options(IndexStore PRIVATE
++  "SHELL:-Xclang --linker-option=-lc"
++  "SHELL:-Xclang --linker-option=-lc++"
++  "SHELL:-Xclang --linker-option=-lncurses"
++  "SHELL:-Xclang --linker-option=-lz"
++)
++target_link_options(IndexStore PRIVATE -Wl,-x -Wl,-r --ld-path=${CMAKE_CURRENT_SOURCE_DIR}/linker.sh)
++
+ install(DIRECTORY ../../include/indexstore
+   COMPONENT IndexStore
+   DESTINATION "${INDEXSTORE_HEADERS_INSTALL_DESTINATION}"
+diff --git a/clang/tools/IndexStore/IndexStore.cpp b/clang/tools/IndexStore/IndexStore.cpp
+index 7ab7142ac234..67404f54325d 100644
+--- a/clang/tools/IndexStore/IndexStore.cpp
++++ b/clang/tools/IndexStore/IndexStore.cpp
+@@ -24,8 +24,12 @@
+ #include "llvm/Support/Chrono.h"
+ #include "llvm/Support/ManagedStatic.h"
+ 
++asm(".linker_option \"-framework\", \"CoreServices\"");
++
+ #if INDEXSTORE_HAS_BLOCKS
+ #include <Block.h>
++#else
++#error "Missing blocks"
+ #endif
+ 
+ using namespace clang;
+diff --git a/clang/tools/IndexStore/linker.sh b/clang/tools/IndexStore/linker.sh
+new file mode 100755
+index 000000000000..455095308c4d
+--- /dev/null
++++ b/clang/tools/IndexStore/linker.sh
+@@ -0,0 +1,21 @@
++#!/bin/bash
++
++set -euo pipefail
++
++skip_next=0
++args=()
++for arg in "$@"; do
++  # Ignore rpath arguments since those aren't valid for relocatable objects
++  if [[ "$arg" == -rpath ]]; then
++    skip_next=1
++    continue
++  elif [[ "$skip_next" == 1 ]]; then
++    skip_next=0
++    continue
++  # -r and -dead_strip cannot be used together
++  elif [[ "$arg" != -dead_strip ]]; then
++    args+=("$arg")
++  fi
++done
++
++ld "${args[@]}"
