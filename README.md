@@ -1,6 +1,6 @@
 # StaticIndexStore
 
-This is a script for building `libIndexStore.dylib` from
+This is distribution of `libIndexStore.dylib` from
 [`apple/llvm-project`](https://github.com/apple/llvm-project) as a
 static archive. This way you do not have to add a non-portable rpath in
 your binaries to Xcode internals or distribute the library alongside
@@ -43,7 +43,7 @@ To create a new release for this project follow these steps:
 - Create a `build` directory in the root of the repo
 - Run cmake with something like `cmake ../llvm -G Ninja
   -DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra'
-  -DCMAKE_BUILD_TYPE=Release`
+  -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0`
 - Run `ninja libIndexStore.dylib`
 - If you'd like a fat binary for supporting arm64 and x86_64 macs,
   repeat the steps above while also adding
