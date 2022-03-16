@@ -43,14 +43,10 @@ To create a new release for this project follow these steps:
 - Create a `build` directory in the root of the repo
 - Run cmake with something like `cmake ../llvm -G Ninja
   -DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra'
-  -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0`
+  -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
+  -DLLVM_ENABLE_LTO=Thin -DCMAKE_OSX_ARCHITECTURES='x86_64;arm64'`
 - Run `ninja libIndexStore.dylib`
-- If you'd like a fat binary for supporting arm64 and x86_64 macs,
-  repeat the steps above while also adding
-  `-DCMAKE_OSX_ARCHITECTURES=x86_64` (or `arm64`, the opposite of your
-  host machine) to your cmake invocation
-- Run `create-xcframework.sh binary1 binary2` to create the combined
-  framework
+- Run `create-xcframework.sh binary` to create the combined framework
 
 ## Notes
 
