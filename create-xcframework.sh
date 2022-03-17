@@ -20,6 +20,6 @@ mkdir -p libIndexStore.framework
 cp "$binary" libIndexStore.framework/libIndexStore
 xcodebuild -create-xcframework -framework libIndexStore.framework -output libIndexStore.xcframework
 popd
-rm -rf ./libIndexStore.xcframework ./libIndexStore.xcqframework.zip
+rm -rf ./libIndexStore.xcframework ./libIndexStore.xcframework.zip
 mv "$workdir/libIndexStore.xcframework" .
 zip -r libIndexStore.xcframework.zip libIndexStore.xcframework
